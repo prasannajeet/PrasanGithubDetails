@@ -18,17 +18,17 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class MainViewModelTest {
 
-    private val result = APICallResult.OnSuccessResponse(listOf(GithubRepo("Hi")))
-    private val uiResult =
-        UIState.OnOperationSuccess<RepoListAdapter>(RepoListAdapter(listOf(GithubRepo("Hi"))))
-    private val exception = UIState.OnOperationFailed(Exception())
-    private val name = "Prasan"
-
     @get:Rule
     val testInstantTaskExecutorRule: TestRule = InstantTaskExecutorRule()
 
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
+
+    private val result = APICallResult.OnSuccessResponse(listOf(GithubRepo("Hi")))
+    private val uiResult =
+        UIState.OnOperationSuccess<RepoListAdapter>(RepoListAdapter(listOf(GithubRepo("Hi"))))
+    private val exception = UIState.OnOperationFailed(Exception())
+    private val name = "Prasan"
 
     private lateinit var viewModel: MainViewModel
 
@@ -53,8 +53,12 @@ class MainViewModelTest {
             val viewModel = MainViewModel()
             viewModel.getRepoList(name)
 
+            //  `when`(GithubRepository.getGithubRepositoryForUser(name)).thenReturn(result)
+
             viewModel.repoListApiCallObserverLiveData.observeForever(uiStateObserver)
             verify(uiStateObserver).onChanged(UIState.Loading)
+//            verify(uiStateObserver).onChanged(uiResult)
+            //           verify(uiStateObserver).onChanged(exception)
             viewModel.repoListApiCallObserverLiveData.removeObserver(uiStateObserver)
         }
     }

@@ -4,7 +4,7 @@ import androidx.annotation.NonNull
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-class GithubRepository {
+object GithubRepository {
 
     private val retrofitClient: GitHubClient by lazy {
         Retrofit.Builder().run {

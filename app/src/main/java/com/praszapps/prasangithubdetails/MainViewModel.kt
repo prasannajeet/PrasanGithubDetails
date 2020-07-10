@@ -15,9 +15,13 @@ class MainViewModel : ViewModel() {
         repoListApiCallObserverLiveData.postValue(UIState.Loading)
 
         viewModelScope.launch {
-            when(val repoCallResult = GithubRepository().getGithubRepositoryForUser(username)) {
-                is APICallResult.OnSuccessResponse -> repoListApiCallObserverLiveData.postValue(UIState.OnOperationSuccess<RepoListAdapter>(RepoListAdapter(repoCallResult.data)))
-                is APICallResult.OnErrorResponse -> repoListApiCallObserverLiveData.postValue(UIState.OnOperationFailed(repoCallResult.exception))
+            when (val repoCallResult = GithubRepository.getGithubRepositoryForUser(username)) {
+                is APICallResult.OnSuccessResponse -> repoListApiCallObserverLiveData.postValue(
+                    UIState.OnOperationSuccess<RepoListAdapter>(RepoListAdapter(repoCallResult.data))
+                )
+                is APICallResult.OnErrorResponse -> repoListApiCallObserverLiveData.postValue(
+                    UIState.OnOperationFailed(repoCallResult.exception)
+                )
             }
         }
     }
