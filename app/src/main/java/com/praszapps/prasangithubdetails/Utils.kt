@@ -2,10 +2,13 @@ package com.praszapps.prasangithubdetails
 import retrofit2.Response
 import java.io.IOException
 
-suspend fun <T : Any> safeApiCall(call: suspend () -> Response<T>, errorMessage: String): APICallResult<T> {
+suspend fun <T : Any> safeApiCall(
+    messageInCaseOfError: String,
+    call: suspend () -> Response<T>
+): APICallResult<T> {
     val response = call()
-    if(response.isSuccessful) return APICallResult.OnSuccessResponse(response.body()!!)
-    return APICallResult.OnErrorResponse(IOException("Error Occurred during getting safe Api result, Custom ERROR - $errorMessage"))
+    if (response.isSuccessful) return APICallResult.OnSuccessResponse(response.body()!!)
+    return APICallResult.OnErrorResponse(IOException("Error Occurred during getting safe Api result, Custom ERROR - $messageInCaseOfError"))
 }
 
 

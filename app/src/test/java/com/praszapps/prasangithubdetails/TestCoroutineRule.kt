@@ -2,25 +2,26 @@ package com.praszapps.prasangithubdetails
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestRule
-import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
 @ExperimentalCoroutinesApi
 class TestCoroutineRule(
     val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
-) : TestWatcher() {
+) : TestRule {
 
-    override fun starting(description: Description?) {
-        super.starting(description)
-        Dispatchers.setMain(testDispatcher)
-    }
+    override fun apply(base: Statement, description: Description?) = object : Statement() {
 
-    override fun finished(description: Description?) {
-        super.finished(description)
-        Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
+        @Throws(Throwable::class)
+        override fun evaluate() {
+            Dispatchers.setMain(testDispatcher)
+            base.evaluate()
+            Dispatchers.resetMain()
+            testDispatcher.cleanupTestCoroutines()
+        }
     }
 }

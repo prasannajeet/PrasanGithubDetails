@@ -2,23 +2,27 @@ package com.praszapps.prasangithubdetails
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import io.mockk.*
-import io.mockk.impl.annotations.MockK
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.setMain
-import okhttp3.Dispatcher
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
+import org.mockito.Mock
+import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnitRunner
 
 @ExperimentalCoroutinesApi
-@RunWith(JUnit4::class)
+@RunWith(MockitoJUnitRunner::class)
 class MainViewModelTest {
+
+    private val result = APICallResult.OnSuccessResponse(listOf(GithubRepo("Hi")))
+    private val uiResult =
+        UIState.OnOperationSuccess<RepoListAdapter>(RepoListAdapter(listOf(GithubRepo("Hi"))))
+    private val exception = UIState.OnOperationFailed(Exception())
+    private val name = "Prasan"
 
     @get:Rule
     val testInstantTaskExecutorRule: TestRule = InstantTaskExecutorRule()
@@ -28,15 +32,15 @@ class MainViewModelTest {
 
     private lateinit var viewModel: MainViewModel
 
-    @MockK
-    private lateinit var repo: GithubRepository
+    @Mock
+    private lateinit var mockRepo: GithubRepository
 
-    @MockK
+    @Mock
     private lateinit var uiStateObserver: Observer<UIState<RepoListAdapter>>
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxUnitFun = true)
+        MockitoAnnotations.initMocks(this)
         viewModel = MainViewModel()
     }
 
@@ -45,17 +49,12 @@ class MainViewModelTest {
     fun whenServer200ReturnListOfRepos() {
 
         testCoroutineRule.testDispatcher.runBlockingTest {
-            coEvery { repo.getGithubRepositoryForUser(any()) } returns APICallResult.OnSuccessResponse<List<GithubRepo>>(listOf(GithubRepo("Hi"), GithubRepo("Bye")))
+
+            val viewModel = MainViewModel()
+            viewModel.getRepoList(name)
 
             viewModel.repoListApiCallObserverLiveData.observeForever(uiStateObserver)
-            viewModel.getRepoList("Prasan")
-
-
-            coVerify { repo.getGithubRepositoryForUser(any()) }
-
-            verify { uiStateObserver.onChanged(UIState.Loading) }
-            verify { uiStateObserver.onChanged(UIState.OnOperationSuccess<RepoListAdapter>(any())) }
-
+            verify(uiStateObserver).onChanged(UIState.Loading)
             viewModel.repoListApiCallObserverLiveData.removeObserver(uiStateObserver)
         }
     }
