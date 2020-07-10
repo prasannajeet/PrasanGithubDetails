@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
+
     val repoListApiCallObserverLiveData: MutableLiveData<UIState<RepoListAdapter>> = MutableLiveData()
 
     fun getRepoList(@NonNull username: String) {
