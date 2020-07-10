@@ -16,10 +16,10 @@ class GithubRepository {
         }
     }
 
-    suspend fun getGithubRepositoryForUser(@NonNull name: String): Result<List<GithubRepo>> {
+    suspend fun getGithubRepositoryForUser(@NonNull name: String): APICallResult<List<GithubRepo>> {
         return safeApiCall(
             call = {retrofitClient.reposForUser(name)},
-            errorMessage = "I don't know why it is not working"
+            errorMessage = "You sure $name is the correct user here? "
         )
     }
 }

@@ -27,7 +27,7 @@ class MainViewModelTest {
     private lateinit var repo: GithubRepository
 
     @Mock
-    private lateinit var apiUsersObserver: Observer<List<GithubRepo>>
+    private lateinit var uiStateObserver: Observer<UIState<RepoListAdapter>>
 
     @Test
     fun whenServer200ReturnListOfRepos() {
@@ -36,10 +36,12 @@ class MainViewModelTest {
                 .`when`(repo).getGithubRepositoryForUser(ArgumentMatchers.anyString())
 
             val viewModel = MainViewModel()
-            viewModel.repoListLiveData.observeForever(apiUsersObserver)
+
+            viewModel.repoListApiCallObserverLiveData.observeForever(uiStateObserver)
             verify(repo).getGithubRepositoryForUser(ArgumentMatchers.anyString())
-            verify(apiUsersObserver).onChanged(listOf(GithubRepo("Hi")))
-            viewModel.repoListLiveData.removeObserver(apiUsersObserver)
+            verify(uiStateObserver).onChanged(UIState.Loading)
+            verify(uiStateObserver).onChanged(UIState.OnOperationSuccess<RepoListAdapter>(any(RepoListAdapter::class.java)))
+            viewModel.repoListApiCallObserverLiveData.removeObserver(uiStateObserver)
         }
     }
 }
